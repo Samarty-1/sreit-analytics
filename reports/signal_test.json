@@ -1,0 +1,50 @@
+{
+  "risk_free_source": "PROXY: US 10Y (^TNX)",
+  "selection": [
+    {
+      "horizon_days": 21,
+      "n_dates": 24,
+      "mean_ic": 0.0485,
+      "ic_std": 0.1779,
+      "ic_tstat": 1.335,
+      "hit_rate": 0.5833,
+      "significant_at_5pct": false,
+      "mean_quantile_spread": -0.0034,
+      "quantile_spread_sharpe": -0.523
+    },
+    {
+      "horizon_days": 63,
+      "n_dates": 24,
+      "mean_ic": 0.0713,
+      "ic_std": 0.2025,
+      "ic_tstat": 1.726,
+      "hit_rate": 0.625,
+      "significant_at_5pct": false,
+      "mean_quantile_spread": -0.0089,
+      "quantile_spread_sharpe": -0.391
+    },
+    {
+      "horizon_days": 126,
+      "n_dates": 24,
+      "mean_ic": 0.1129,
+      "ic_std": 0.2334,
+      "ic_tstat": 2.37,
+      "hit_rate": 0.625,
+      "significant_at_5pct": true,
+      "mean_quantile_spread": 0.0004,
+      "quantile_spread_sharpe": 0.007
+    }
+  ],
+  "confirmation": {
+    "horizon_days": 126,
+    "n_dates": 30,
+    "mean_ic": -0.0525,
+    "ic_std": 0.174,
+    "ic_tstat": -1.652,
+    "hit_rate": 0.4667,
+    "significant_at_5pct": false,
+    "mean_quantile_spread": -0.0021,
+    "quantile_spread_sharpe": -0.052
+  },
+  "verdict": "NOT confirmed -- the selection-set result did not survive"
+}

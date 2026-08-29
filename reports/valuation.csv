@@ -1,0 +1,23 @@
+ticker,name,sub_sector,price,dist_yield_pct,yield_spread_pp,spread_zscore,dist_growth_3y_pct,total_return_pct
+OXMU.SI,Prime US REIT,Office,0.15,6.64,1.97,4.32,-42.59,-59.3
+CMOU.SI,KORE US REIT,Office,0.173,3.76,-0.91,3.85,-58.23,-63.0
+CY6U.SI,CapitaLand India Trust,Diversified,0.975,12.17,7.5,3.22,13.45,8.7
+AJBU.SI,Keppel DC REIT,Data Centre,2.2,4.98,0.31,0.09,16.93,-0.7
+J69U.SI,Frasers Centrepoint Trust,Retail,2.16,5.6,0.93,-0.1,-12.88,17.4
+M1GU.SI,Alpha Integrated REIT,Industrial,0.48,8.04,3.37,-0.21,7.93,106.2
+C2PU.SI,Parkway Life REIT,Healthcare,4.12,3.98,-0.69,-0.37,3.55,36.6
+A17U.SI,CapitaLand Ascendas REIT,Industrial,2.43,6.18,1.5,-0.49,-1.37,2.2
+TS0U.SI,OUE REIT,Office,0.36,6.97,2.3,-0.73,18.08,43.2
+CRPU.SI,Sasseur REIT,Retail,0.695,8.83,4.16,-0.77,2.38,46.2
+HMN.SI,CapitaLand Ascott Trust,Hospitality,0.855,7.14,2.47,-0.85,0.75,35.4
+AU8U.SI,CapitaLand China Trust,Retail,0.64,7.47,2.8,-0.86,-12.52,-15.2
+N2IU.SI,Mapletree Pan Asia Commercial Trust,Office,1.27,6.24,1.56,-0.99,6.43,-6.4
+JYEU.SI,Lendlease Global Commercial REIT,Diversified,0.56,6.6,1.93,-0.99,-0.47,27.4
+M44U.SI,Mapletree Logistics Trust,Industrial,1.16,6.26,1.59,-1.05,-6.93,-21.7
+P40U.SI,Starhill Global REIT,Retail,0.525,7.01,2.34,-1.06,-1.06,82.4
+BUOU.SI,Frasers Logistics & Commercial Trust,Industrial,0.93,6.34,1.67,-1.13,6.88,-0.6
+ME8U.SI,Mapletree Industrial Trust,Industrial,1.92,6.54,1.86,-1.38,-0.48,-10.8
+C38U.SI,CapitaLand Integrated Commercial Trust,Diversified,2.37,4.49,-0.19,-1.66,-0.01,70.2
+K71U.SI,Keppel REIT,Office,0.88,5.81,1.14,-1.76,10.28,18.6
+UD1U.SI,IREIT Global,Office,0.168,6.59,1.92,-1.87,-25.9,-62.7
+Q5T.SI,Far East Hospitality Trust,Hospitality,0.55,5.6,0.93,-2.91,-5.5,43.3
