@@ -60,28 +60,51 @@ over bonds is unusually wide is cheap and should outperform. Entirely
 plausible — so it was tested, with the data split by date into a selection
 half and a confirmation half up front.
 
-**Selection set (2020-08 to 2023-07), choosing the horizon here and only here:**
+**Selection set (2021-08 to 2024-01), choosing the horizon here and only here:**
 
-| Horizon | Mean IC | t-stat | Significant |
+| Horizon | Mean IC | t-stat (HAC) | naive t | lag-1 autocorr | independent draws | Significant |
+|---|---|---|---|---|---|---|
+| **21d** | 0.071 | **1.87** | 1.87 | −0.16 | 30 | no |
+| 63d | 0.084 | 1.75 | 2.07 | +0.36 | 10 | no |
+| 126d | 0.081 | 1.57 | 1.98 | +0.46 | 5 | no |
+
+**Confirmation set (2024-02 to 2026-08), looked at once, horizon fixed above:**
+
+| Horizon | Mean IC | t-stat (HAC) | Significant |
 |---|---|---|---|
-| 21d | 0.049 | 1.34 | no |
-| 63d | 0.071 | 1.73 | no |
-| **126d** | **0.113** | **2.37** | **yes** |
+| 21d | **−0.015** | −0.38 | no |
 
-The 126-day horizon looks like a real finding: IC of 0.11 with t = 2.37,
-significant at 5%, hit rate 62.5%.
+**The sign flipped.** The signal that scored +0.07 on the selection half
+scored −0.015 on data it had never touched. Three horizons were tested and
+none of them survived confirmation.
 
-**Confirmation set (2023-08 to 2026-08), looked at once, horizon fixed above:**
-
-| Horizon | Mean IC | t-stat | Significant |
-|---|---|---|---|
-| 126d | **−0.053** | −1.65 | no |
-
-**The sign flipped.** The signal that scored +0.11 on the selection half
-scored −0.05 on data it had never touched. This is exactly what tuning a
-horizon on all the data and reporting the best result would have concealed:
-three horizons were tested, one crossed the significance line, and it did not
-survive.
+> **Correction (2026-08-30).** This table used to report a **significant**
+> 126-day result — mean IC 0.113, t = 2.37 — and to describe it as "what a real
+> finding looks like before it dies". That t-statistic was wrong, and it was
+> the only significant result in the study.
+>
+> Observation dates are 21 trading days apart while the horizon is 126 days, so
+> **six consecutive observations share most of their return window**. The
+> lag-1 autocorrelation of the IC series is +0.46, which is the overlap
+> signature. The plain `mean / (sd / √n)` treats 24 overlapping observations as
+> 24 independent draws; they are worth about **four**. The Newey-West
+> statistic on the original split was **1.83**, not 2.37 — never significant.
+>
+> Two smaller defects came out with it. The 252-day rolling z-score warmup left
+> the first 12 sampled dates empty, and the split ran *before* they were
+> dropped — so the "selection half" was 24 usable dates against the
+> confirmation half's 30, over a window a year longer than the one actually
+> used. And the horizon was chosen by highest mean IC, which rises mechanically
+> with horizon because longer windows are smoother. It is now chosen on the
+> corrected t-statistic, the halves are 30/30 on usable dates, and the
+> quantile-spread Sharpe annualises on independent periods rather than on
+> sampling frequency.
+>
+> **The conclusion did not change** — the signal still fails confirmation, and
+> the sign still flips. What changed is that the study no longer offers a
+> significant result it was not entitled to claim. Both statistics are now
+> reported side by side (`ic_tstat` and `ic_tstat_naive`) so the gap stays
+> visible.
 
 ### Why it fails — look at the top of the ranking
 
@@ -188,8 +211,15 @@ growth, gearing headroom against the MAS cap, and interest-coverage is the
 obvious next version. That is a new hypothesis and would need its own
 confirmation set; the one used here has been spent.
 
-Worth stating: three horizons were tested and one crossed significance on the
-selection half. That is a small search, but it is not zero, and the deflated
-Sharpe machinery in
+Worth stating: three horizons were tested. None crossed significance once the
+overlap correction was applied, but the search is still a search, and the
+deflated Sharpe machinery in
 [backtest-overfit-audit](https://github.com/Samarty-1/backtest-overfit-audit)
 is the right tool to put a number on what it cost.
+
+Also worth stating, because it cuts the other way: the universe is the 22
+S-REITs listed **today**, so it is survivorship-biased. The names missing from
+it — Eagle Hospitality Trust among them — are disproportionately the ones that
+traded at very wide yield spreads and then collapsed, which is to say
+precisely the names this signal would have called cheapest. The bias flatters
+the yield-spread signal, and it fails confirmation anyway.
