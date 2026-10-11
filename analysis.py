@@ -25,6 +25,9 @@ from src.universe import MARKET_PROXY, SREITS, sub_sector_of, tickers, universe_
 
 warnings.filterwarnings("ignore")
 REPORTS = Path(__file__).resolve().parent / "reports"
+# Minimum names needed for a cross-sectional rank correlation to mean anything.
+# Matches the floor in signal_test.information_coefficient.
+MIN_NAMES = 8
 
 
 def fetch(period: str):
@@ -119,27 +122,55 @@ def main() -> None:
 
     print("\n[4] Does the yield-spread z-score predict forward returns?")
     signal = build_signal(prices, distributions, rf)
-    monthly = signal.index[::21]
-    selection, confirmation = signal_test.split_selection_confirmation(monthly)
+    step = 21
+    sampled = signal.index[::step]
+
+    # Drop the rolling-z-score warmup before splitting, not after.
+    #
+    # rolling_zscore needs 252 observations, so the first ~12 sampled dates
+    # carry no usable signal at all. Splitting the raw date list in half then
+    # handed the selection set 12 empty dates and 24 real ones against the
+    # confirmation set's 30+, and printed a selection window a year longer than
+    # the one actually used. Splitting on usable dates makes the halves
+    # comparable and the reported window true.
+    usable = sampled[signal.reindex(sampled).notna().sum(axis=1) >= MIN_NAMES]
+    dropped = len(sampled) - len(usable)
+    selection, confirmation = signal_test.split_selection_confirmation(usable)
     horizons = [int(h) for h in args.horizons.split(",")]
 
+    print(f"    {dropped} of {len(sampled)} sampled dates dropped to the z-score warmup")
     print(f"    selection:    {selection[0].date()} to {selection[-1].date()} ({len(selection)} dates)")
     print(f"    confirmation: {confirmation[0].date()} to {confirmation[-1].date()} ({len(confirmation)} dates)")
+    print(f"    sampling every {step} trading days; overlap correction applied per horizon")
 
     print("\n    SELECTION SET (choose the horizon here, and only here)")
-    selection_results = [signal_test.evaluate(signal, prices, h, selection) for h in horizons]
+    selection_results = [
+        signal_test.evaluate(signal, prices, h, selection, step_days=step) for h in horizons
+    ]
     print(pd.DataFrame(selection_results).to_string(index=False))
 
+    # Select on the overlap-corrected t-statistic, not on mean IC.
+    #
+    # Mean IC rises mechanically with horizon -- a longer window is smoother
+    # and more autocorrelated -- so ranking horizons by mean IC picks the
+    # longest one nearly every time, on a statistic that says nothing about
+    # whether the mean is distinguishable from zero.
     best = max(
-        (r for r in selection_results if np.isfinite(r.get("mean_ic", np.nan))),
-        key=lambda r: r["mean_ic"], default=None,
+        (r for r in selection_results if np.isfinite(r.get("ic_tstat", np.nan))),
+        key=lambda r: r["ic_tstat"], default=None,
     )
     if best is None:
         print("\n    No usable horizon on the selection set.")
         return
 
+    print(f"\n    Horizon chosen on corrected t-stat: {best['horizon_days']}d "
+          f"(t={best['ic_tstat']}, naive t={best.get('ic_tstat_naive')}). "
+          f"{len(horizons)} horizons were tried, so even this is a 3-way search.")
+
     print(f"\n    CONFIRMATION SET (looked at once, horizon={best['horizon_days']}d fixed above)")
-    confirmed = signal_test.evaluate(signal, prices, best["horizon_days"], confirmation)
+    confirmed = signal_test.evaluate(
+        signal, prices, best["horizon_days"], confirmation, step_days=step
+    )
     print(pd.DataFrame([confirmed]).to_string(index=False))
 
     verdict = (
@@ -154,6 +185,8 @@ def main() -> None:
     betas.to_csv(REPORTS / "rate_betas.csv", index=False)
     (REPORTS / "signal_test.json").write_text(json.dumps({
         "risk_free_source": rf_source,
+        "sampling_step_days": step,
+        "warmup_dates_dropped": int(dropped),
         "selection": selection_results,
         "confirmation": confirmed,
         "verdict": verdict,
